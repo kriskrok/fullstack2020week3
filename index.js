@@ -1,8 +1,14 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 const PORT = 3001
 
+app.use(morgan('tiny'))
 app.use(express.json())
+
+const unknownEndpoint = (req, res) => {
+  response.status(404).send({error: 'unknown endpoint'})
+}
 
 let persons = [
   {
@@ -41,7 +47,7 @@ app.get('/api/persons', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
-  
+
   if (!body.name) {
     return res.status(400).json({
       error: 'name missing'
@@ -98,6 +104,7 @@ app.get('/info', (req, res) => {
   res.send(`<p>Phonebook has info for ${persons.length} people</br>${new Date()}</p>`)
 })
 
+app.use(unknownEndpoint)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
