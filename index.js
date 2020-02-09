@@ -3,12 +3,12 @@ const morgan = require('morgan')
 const app = express()
 const PORT = 3001
 
-app.use(morgan('tiny'))
 app.use(express.json())
 
-const unknownEndpoint = (req, res) => {
-  response.status(404).send({error: 'unknown endpoint'})
-}
+morgan.token( 'body', (req, res) => JSON.stringify(req.body) )
+
+app.use(
+  morgan(':method :url :status :req[content-length] - :response-time ms :body'))
 
 let persons = [
   {
@@ -37,8 +37,10 @@ const generateID = () => Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER - 1
 
 const previouslyAdded = (name) => persons.some(person => person.name === name)
 
+const unknownEndpoint = (req, res) => res.status(404).send({error: 'unknown endpoint'})
+
 app.get('/', (request, response) => {
-  response.send('<h1>The cake is a lie!</h1>')
+  response.send('<h2>Aperture laboratories</h2><p>Cleveland, Ohio</p>')
 })
 
 app.get('/api/persons', (req, res) => {
@@ -75,14 +77,12 @@ app.post('/api/persons', (req, res) => {
   persons = persons.concat(person)
 
   res.json(person)
-
 })
 
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = persons.find(person => person.id === id)
 
-  console.log(person)
   if (person) {
     res.json(person)
   } else {
@@ -92,11 +92,7 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  
-  console.log(`id: ${id}`, persons.some(person => person.id === id))
-
   persons = persons.filter(person => person.id !== id)
-
   res.status(204).end()
 })
 
