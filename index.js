@@ -29,6 +29,8 @@ let persons = [
 
 const generateID = () => Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER - 1) + 1)
 
+const previouslyAdded = (name) => persons.some(person => person.name === name)
+
 app.get('/', (request, response) => {
   response.send('<h1>The cake is a lie!</h1>')
 })
@@ -39,6 +41,25 @@ app.get('/api/persons', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
+  
+  if (!body.name) {
+    return res.status(400).json({
+      error: 'name missing'
+    })
+  }
+
+  if (!body.number) {
+    return res.status(400).json({
+      error: 'number missing'
+    })
+  }
+
+  if (previouslyAdded(body.name)) {
+    return res.status(418).json({
+      error: `${body.name} is already added to phonebook, name must be unique`
+    })
+  }
+
   const person = {
     name: body.name,
     number: body.number,
@@ -48,6 +69,7 @@ app.post('/api/persons', (req, res) => {
   persons = persons.concat(person)
 
   res.json(person)
+
 })
 
 app.get('/api/persons/:id', (req, res) => {
