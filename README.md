@@ -1,6 +1,7 @@
-# Phonebook for week3 :space_invader:
+# Phonebook for week3 :shipit:
 ***
 
+- [Heroku](https://people-catalog.herokuapp.com/)
 - [rest of stuffs](https://github.com/kriskrok/fullstack2020/)
 
 <p align="center">
