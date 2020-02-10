@@ -5,7 +5,7 @@ const morgan = require('morgan')
 
 const PORT = process.env.PORT || 3001
 
-app.use('build', express.static(path.join(__dirname, 'build')))
+app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 
@@ -42,10 +42,6 @@ const generateID = () => Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER - 1
 const previouslyAdded = (name) => persons.some(person => person.name === name)
 
 const unknownEndpoint = (req, res) => res.status(404).send({error: 'unknown endpoint'})
-
-app.get('/', (request, response) => {
-  response.send('<h2>Aperture laboratories</h2><p>Cleveland, Ohio</p>')
-})
 
 app.get('/api/persons', (req, res) => {
   res.json(persons)
