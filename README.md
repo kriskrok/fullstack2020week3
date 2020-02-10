@@ -1,7 +1,7 @@
 # Phonebook for week3 :shipit:
 ***
 
-- [Heroku](https://people-catalog.herokuapp.com/)
+- [Heroku](https://people-catalog.herokuapp.com/info)
 - [rest of stuffs](https://github.com/kriskrok/fullstack2020/)
 
 <p align="center">

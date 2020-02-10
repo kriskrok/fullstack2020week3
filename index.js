@@ -5,6 +5,7 @@ const morgan = require('morgan')
 
 const PORT = process.env.PORT || 3001
 
+app.use('build', express.static(path.join(__dirname, 'build')))
 app.use(express.json())
 app.use(cors())
 
