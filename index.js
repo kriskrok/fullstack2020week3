@@ -3,7 +3,6 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
-const mongoose = require('mongoose')
 
 const PORT = process.env.PORT
 
@@ -18,24 +17,25 @@ app.use(
 
 const Contact = require('./models/contact')
 
-const unknownEndpoint = (req, res) => res.status(404).send({error: 'unknown endpoint'})
+const unknownEndpoint = (req, res) => res.status(404).send({ error: 'unknown endpoint' })
 
 app.get('/api/persons', (req, res, next) => {
   Contact.find({}).then(contacts => {
     res.json(contacts.map(contact => contact.toJSON()))
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
+  console.log('body: ', body)
 
   if (!body.name) {
-    return res.status(400).json({error: 'name missing'})
+    return res.status(400).json({ error: 'name missing' })
   }
 
   if (!body.number) {
-    return res.status(400).json({error: 'number missing'})
+    return res.status(400).json({ error: 'number missing' })
   }
 
   const contact = new Contact({
@@ -43,10 +43,15 @@ app.post('/api/persons', (req, res, next) => {
     number: body.number,
   })
 
-  contact.save().then(savedContact => {
-    res.json(savedContact.toJSON())
-  })
-  .catch(error => next(error))
+  contact
+    .save()
+    .then(savedContact => {
+      return savedContact.toJSON()
+    })
+    .then(savedAndFormattedContact => {
+      res.json(savedAndFormattedContact)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -70,18 +75,18 @@ app.put('/api/persons/:id', (req, res, next) => {
   }
 
   Contact.findByIdAndUpdate(req.params.id, contact, { new: true })
-  .then(updatedContact => {
-    res.json(updatedContact.toJSON())
-  })
-  .catch(error => next(error))
+    .then(updatedContact => {
+      res.json(updatedContact.toJSON())
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Contact.findByIdAndRemove(req.params.id)
-  .then(result => {
-    res.status(204).end()
-  })
-  .catch(error => next(error))
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (req, res, next) => {
@@ -89,7 +94,7 @@ app.get('/info', (req, res, next) => {
     const acquaintances = contacts.reduce((acc, cur) => acc + 1, 0)
     res.send(`<p>Phonebook has info for ${acquaintances} people</br>${new Date()}</p>`)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 
@@ -98,8 +103,10 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name === 'CastError' && error.kind == 'ObjectId') {
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).send({ error: 'malformed id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)

@@ -24,9 +24,9 @@ if (process.argv.length === 3) {
   Contact.find({}).then(result => {
     console.log('phonebook:')
     result.forEach(person => {
-      console.log(person.name, person.number)  
+      console.log(person.name, person.number)
     })
-    mongoose.connection.close();
+    mongoose.connection.close()
   })
 
 } else if (process.argv.length === 5) {
@@ -35,13 +35,13 @@ if (process.argv.length === 3) {
     name: process.argv[3],
     number: process.argv[4],
   })
-  
+
   newContact.save().then(response => {
-    console.log(`Added ${process.argv[3]} with phonenumber ${process.argv[4]} to phonebook`);
-    mongoose.connection.close();
+    console.log(`Added ${response.name} with phonenumber ${response.number} to phonebook`)
+    mongoose.connection.close()
   })
 
 } else {
-  mongoose.connection.close();
+  mongoose.connection.close()
   process.exit(1)
 }
